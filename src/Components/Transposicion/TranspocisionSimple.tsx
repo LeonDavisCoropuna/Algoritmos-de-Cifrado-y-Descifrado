@@ -1,39 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { Button } from "../Button/Button"; // Asumiendo que Button ya está estilizado con Tailwind
 
 export const TranspocisionSimple = () => {
-  const [inputText, setInputText] = useState<string>('');
-  const [key, setKey] = useState<string>('');
-  const [encryptedText, setEncryptedText] = useState<string>('');
-  const [decryptedText, setDecryptedText] = useState<string>('');
+  const [inputText, setInputText] = useState<string>("");
+  const [key, setKey] = useState<string>("");
+  const [encryptedText, setEncryptedText] = useState<string>("");
+  const [decryptedText, setDecryptedText] = useState<string>("");
 
   const encrypt = (text: string, key: string): string => {
     const keyLower = key.toLowerCase();
     const numCols = key.length;
     const numRows = Math.ceil(text.length / numCols);
-    const paddedText = text.padEnd(numRows * numCols, ' '); // Padding with spaces if necessary
+    const paddedText = text.padEnd(numRows * numCols, " "); // Padding con espacios si es necesario
     const matrix: string[][] = [];
 
-    
-    // Fill the matrix row by row
+    // Llenar la matriz fila por fila
     for (let i = 0; i < numRows; i++) {
-      matrix.push(paddedText.slice(i * numCols, (i + 1) * numCols).split(''));
+      matrix.push(paddedText.slice(i * numCols, (i + 1) * numCols).split(""));
     }
 
-    // Create a key order array
+    // Crear un arreglo de orden de clave
     const keyOrder = keyLower
-      .split('')
+      .split("")
       .map((char, index) => ({ char, index }))
       .sort((a, b) => a.char.localeCompare(b.char))
-      .map(item => item.index);
+      .map((item) => item.index);
 
-    // Read the matrix column by column based on key order
-    let encrypted = '';
+    // Leer la matriz columna por columna basada en el orden de clave
+    let encrypted = "";
     for (const index of keyOrder) {
       for (let j = 0; j < numRows; j++) {
-        encrypted += matrix[j][index] || ''; // Use '' if the index is out of range
+        encrypted += matrix[j][index] || ""; // Usa '' si el índice está fuera de rango
       }
     }
-    return encrypted.trim(); // Return trimmed string
+    return encrypted.trim(); // Retornar cadena sin espacios al final
   };
 
   const decrypt = (text: string, key: string): string => {
@@ -41,14 +41,16 @@ export const TranspocisionSimple = () => {
     const numCols = key.length;
     const numRows = Math.ceil(text.length / numCols);
     const keyOrder = keyLower
-      .split('')
+      .split("")
       .map((char, index) => ({ char, index }))
       .sort((a, b) => a.char.localeCompare(b.char))
-      .map(item => item.index);
+      .map((item) => item.index);
 
-    const decryptedMatrix: string[][] = Array.from({ length: numRows }, () => Array(numCols).fill(''));
+    const decryptedMatrix: string[][] = Array.from({ length: numRows }, () =>
+      Array(numCols).fill("")
+    );
 
-    // Fill the decrypted matrix column by column based on key order
+    // Llenar la matriz descifrada columna por columna basada en el orden de clave
     let index = 0;
     for (const col of keyOrder) {
       for (let j = 0; j < numRows; j++) {
@@ -59,51 +61,70 @@ export const TranspocisionSimple = () => {
       }
     }
 
-    // Read the matrix row by row
-    let decrypted = '';
+    // Leer la matriz fila por fila
+    let decrypted = "";
     for (let i = 0; i < numRows; i++) {
-      decrypted += decryptedMatrix[i].join('');
+      decrypted += decryptedMatrix[i].join("");
     }
-    return decrypted.trim(); // Return trimmed string
+    return decrypted.trim(); // Retornar cadena sin espacios al final
   };
 
-  const handleEncrypt = () => {
-    //const cleanedText = inputText.replace(/\s+/g, ''); // Remove all white spaces
-    const result = encrypt(inputText, key);
-    setEncryptedText(result);
-  };
-
-  const handleDecrypt = () => {
-    const result = decrypt(encryptedText, key);
-    setDecryptedText(result);
+  const handleAction = (method: "cifrar" | "descifrar") => {
+    if (method === "cifrar") {
+      const result = encrypt(inputText, key);
+      setEncryptedText(result);
+      setDecryptedText(""); // Limpiar el texto descifrado
+    } else if (method === "descifrar") {
+      const result = decrypt(encryptedText, key);
+      setDecryptedText(result);
+    }
   };
 
   return (
-    <div className='bg-blue-100'>
-      <h1>Transposición Columnar</h1>
-      <div>
-        <label>Texto: </label>
+    <div className="bg-blue-100 p-6 rounded-lg shadow-md max-w-lg mx-auto mt-6">
+      <h1 className="text-2xl font-bold mb-4 text-center">
+        Transposición Columnar Simple
+      </h1>
+
+      <div className="mb-4">
+        <label className="block mb-2 font-semibold">Texto:</label>
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
+          className="border border-gray-300 p-2 w-full rounded"
         />
       </div>
-      <div>
-        <label>Clave: </label>
+
+      <div className="mb-4">
+        <label className="block mb-2 font-semibold">Clave:</label>
         <input
           type="text"
           value={key}
           onChange={(e) => setKey(e.target.value)}
+          className="border border-gray-300 p-2 w-full rounded"
         />
       </div>
-      <button onClick={handleEncrypt}>Cifrar</button>
-      <button onClick={handleDecrypt}>Descifrar</button>
-      <div>
-        <h3>Texto Cifrado:</h3>
-        <p>{encryptedText}</p>
-        <h3>Texto Descifrado:</h3>
-        <p>{decryptedText}</p>
+
+      {/* Botones para Cifrar/Descifrar */}
+      <div className="flex justify-center space-x-4">
+        <Button
+          opciones={[
+            { label: "Cifrar", value: "cifrar" },
+            { label: "Descifrar", value: "descifrar" },
+          ]}
+          onClick={(value) => handleAction(value as "cifrar" | "descifrar")} // Ejecuta directamente la acción seleccionada
+          selectedValue={undefined} // No es necesario mantener un estado de selección aquí
+        />
+      </div>
+      <div className="mt-4">
+        <h3 className="font-semibold">Texto Cifrado:</h3>
+        <p className="p-2 bg-gray-200 rounded">{encryptedText || "..."}</p>
+      </div>
+
+      <div className="mt-4">
+        <h3 className="font-semibold">Texto Descifrado:</h3>
+        <p className="p-2 bg-gray-200 rounded">{decryptedText || "..."}</p>
       </div>
     </div>
   );

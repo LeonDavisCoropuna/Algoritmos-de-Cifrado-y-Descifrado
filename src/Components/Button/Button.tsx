@@ -1,6 +1,12 @@
 import React from 'react'
 
-export const Button = ({ opciones, onClick, selectedValue }) => {
+interface BotonesProps {
+    opciones: { label: string; value: string }[];  // Array de opciones con label y value
+    onClick: (value: string) => void;  // Función para manejar el clic
+    selectedValue: string;  // Valor actualmente seleccionado
+  }
+
+export const Button: React.FC<BotonesProps> = ({ opciones, onClick, selectedValue }) => {
     return (
         <div className="flex space-x-4">
           {opciones.map((opcion) => (
