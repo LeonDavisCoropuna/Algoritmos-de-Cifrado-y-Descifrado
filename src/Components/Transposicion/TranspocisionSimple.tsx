@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "../Button/Button"; // Asumiendo que Button ya está estilizado con Tailwind
 
-export const TranspocisionSimple = () => {
+const TranspocisionSimple = () => {
   const [inputText, setInputText] = useState<string>("");
   const [key, setKey] = useState<string>("");
   const [encryptedText, setEncryptedText] = useState<string>("");
@@ -114,7 +114,7 @@ export const TranspocisionSimple = () => {
             { label: "Descifrar", value: "descifrar" },
           ]}
           onClick={(value) => handleAction(value as "cifrar" | "descifrar")} // Ejecuta directamente la acción seleccionada
-          selectedValue={undefined} // No es necesario mantener un estado de selección aquí
+          selectedValue={"undefined"} // No es necesario mantener un estado de selección aquí
         />
       </div>
       <div className="mt-4">
@@ -129,3 +129,5 @@ export const TranspocisionSimple = () => {
     </div>
   );
 };
+
+export default TranspocisionSimple

@@ -6,7 +6,7 @@ import { Button } from '../Button/Button';
 
 export const Transpocision = () => {
 
-  const [selectedMethod, setSelectedMethod] = useState<'simple' | 'doble'>(); // Estado para controlar el método seleccionado
+  const [selectedMethod, setSelectedMethod] = useState<'simple' | 'doble'>('simple'); // Estado para controlar el método seleccionado
 
   const renderSelectedComponent = () => {
     switch (selectedMethod) {

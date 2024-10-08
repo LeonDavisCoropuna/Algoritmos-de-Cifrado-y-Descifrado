@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "../Button/Button";
 
-export const TranspocisionDoble = () => {
+const TranspocisionDoble = () => {
   const [inputText, setInputText] = useState<string>("");
   const [key1, setKey1] = useState<string>(""); // Primer clave
   const [key2, setKey2] = useState<string>(""); // Segunda clave
@@ -181,7 +181,7 @@ export const TranspocisionDoble = () => {
             { label: "Descifrar", value: "descifrar" },
           ]}
           onClick={(value) => handleAction(value as "cifrar" | "descifrar")} // Ejecuta directamente la acción seleccionada
-          selectedValue={undefined} // No es necesario mantener un estado de selección aquí
+          selectedValue={"undefined"} // No es necesario mantener un estado de selección aquí
         />
       </div>
       <div className="mt-4">
@@ -196,3 +196,5 @@ export const TranspocisionDoble = () => {
     </div>
   );
 };
+
+export default TranspocisionDoble
