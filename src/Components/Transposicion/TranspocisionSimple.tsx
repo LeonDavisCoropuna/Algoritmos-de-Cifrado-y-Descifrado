@@ -6,6 +6,7 @@ const TranspocisionSimple = () => {
   const [key, setKey] = useState<string>("");
   const [encryptedText, setEncryptedText] = useState<string>("");
   const [decryptedText, setDecryptedText] = useState<string>("");
+  const [matrix, setMatrix] = useState<string[][]>([]); // Estado para la matriz
 
   const encrypt = (text: string, key: string): string => {
     const keyLower = key.toLowerCase();
@@ -18,6 +19,9 @@ const TranspocisionSimple = () => {
     for (let i = 0; i < numRows; i++) {
       matrix.push(paddedText.slice(i * numCols, (i + 1) * numCols).split(""));
     }
+
+    // Guardar la matriz en el estado
+    setMatrix(matrix);
 
     // Crear un arreglo de orden de clave
     const keyOrder = keyLower
@@ -71,6 +75,7 @@ const TranspocisionSimple = () => {
 
   const handleAction = (method: "cifrar" | "descifrar") => {
     if (method === "cifrar") {
+      //let inputTexts = inputText.replace(/\s+/g, ''); // Eliminar todos los espacios
       const result = encrypt(inputText, key);
       setEncryptedText(result);
       setDecryptedText(""); // Limpiar el texto descifrado
@@ -87,6 +92,16 @@ const TranspocisionSimple = () => {
       </h1>
 
       <div className="mb-4">
+        <label className="block mb-2 font-semibold">Clave:</label>
+        <input
+          type="text"
+          value={key}
+          onChange={(e) => setKey(e.target.value)}
+          className="border border-gray-300 p-2 w-full rounded"
+        />
+      </div>
+      
+      <div className="mb-4">
         <label className="block mb-2 font-semibold">Texto:</label>
         <input
           type="text"
@@ -96,15 +111,7 @@ const TranspocisionSimple = () => {
         />
       </div>
 
-      <div className="mb-4">
-        <label className="block mb-2 font-semibold">Clave:</label>
-        <input
-          type="text"
-          value={key}
-          onChange={(e) => setKey(e.target.value)}
-          className="border border-gray-300 p-2 w-full rounded"
-        />
-      </div>
+      
 
       {/* Botones para Cifrar/Descifrar */}
       <div className="flex justify-center space-x-4">
@@ -117,6 +124,42 @@ const TranspocisionSimple = () => {
           selectedValue={"undefined"} // No es necesario mantener un estado de selección aquí
         />
       </div>
+
+       {/* Matriz Encriptada */}
+      <div className="flex-1 border p-2 rounded bg-white mt-6">
+        <h4 className="font-semibold">Matriz Encriptada</h4>
+        {matrix.length > 0 ? (
+          <table className="w-full border-collapse">
+            <thead>
+              <tr>
+                {/* Encabezado de la clave */}
+                {key.split("").map((char, index) => (
+                  <th key={index} className="border border-gray-300 p-2 bg-blue-100">
+                    {char}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {matrix.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.map((cell, cellIndex) => (
+                    <td
+                      key={cellIndex}
+                      className={`border border-gray-300 px-2 ${cell !== ' ' ? 'bg-green-200' : 'bg-white'}`} // Color de fondo al seleccionar
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No hay matriz encriptada para mostrar.</p>
+        )}
+      </div>
+
       <div className="mt-4">
         <h3 className="font-semibold">Texto Cifrado:</h3>
         <p className="p-2 bg-gray-200 rounded">{encryptedText || "..."}</p>
