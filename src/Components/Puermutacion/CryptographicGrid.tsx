@@ -1,249 +1,234 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '../Button/Button';
 
-const DEFAULT_GRID = [
-  [1, 0, 1, 0, 1, 0, 0, 0],
-  [0, 1, 1, 0, 1, 0, 1, 0],
-  [0, 1, 1, 0, 1, 1, 1, 0],
-  [1, 0, 0, 1, 0, 0, 0, 1],
-  [0, 0, 0, 0, 1, 0, 0, 0],
-  [0, 1, 0, 0, 0, 0, 1, 0],
-  [1, 0, 1, 0, 1, 0, 0, 0],
-  [0, 0, 0, 0, 0, 1, 0, 1]
-];
+const EditableMatrix: React.FC = () => {
+  const [matrix, setMatrix] = useState<number[][]>([
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 0, 1],
+    [0, 0, 1, 0],
+  ]);
 
-const rotateGrid = (grid: number[][]): number[][] => {
-  return grid[0].map((_, index) => grid.map(row => row[index])).reverse();
-};
+  const [textMatrix, setTextMatrix] = useState<string[][]>(
+    Array.from({ length: 4 }, () => Array(4).fill(''))
+  );
+
+  const [inputText, setInputText] = useState<string>('HELLOWORLD123456'); // Texto de 16 letras
+  const [encryptedText, setEncryptedText] = useState<string>('');
+  const [decryptedText, setDecryptedText] = useState<string>('');
+
+  const toggleCell = (row: number, col: number): void => {
+    const newMatrix = matrix.map((r, rowIndex) =>
+      r.map((cell, colIndex) => (rowIndex === row && colIndex === col ? (cell === 0 ? 1 : 0) : cell))
+    );
+    setMatrix(newMatrix);
+  };
+
+  const rotateMatrix = (mat: number[][]): number[][] => {
+    // Transponer la matriz
+    const transposed = mat[0].map((_, index) =>
+      mat.map(row => row[index])
+    );
+
+    // Invertir cada fila de la matriz transpuesta
+    const rotated = transposed.map(row => row.reverse());
+
+    return rotated;
+  };
+
+  const handleConvertTextToMatrix = (): void => {
+    // Rellena con 'X' hasta 16 caracteres
+    const paddedText = inputText.padEnd(16, '-');
+    setInputText(paddedText)
+    const newTextMatrix = Array.from({ length: 4 }, (_, rowIndex) =>
+      Array.from({ length: 4 }, (_, colIndex) =>
+        paddedText[rowIndex * 4 + colIndex] // Obtiene el carácter correspondiente
+      )
+    );
+    setTextMatrix(newTextMatrix);
+  };
 
 
-// Función para cifrar el texto y devolverlo en una matriz cuadrada
-const cipher = (grid: number[][], n: number, text: string): string[][] => {
-  const square: string[][] = Array.from({ length: n }, () => Array(n).fill("0"));
-  let letter = 0;
-  const listText = text.split(''); // Convertir el texto en una lista de caracteres
-  let rotationsNb = 0;
+  const encryptText = (): void => {
+    let currentMatrix = matrix;
+    let encrypted = '';
 
-  // Ejecutar mientras haya rotaciones disponibles (4 rotaciones) o queden letras por insertar
-  while (rotationsNb < 4 || letter < listText.length) {
-    for (let j = 0; j < n; j++) {
-      for (let k = 0; k < n; k++) {
-        if (grid[j][k] === 1 && letter < listText.length) {
-          square[j][k] = listText[letter];
-          letter++;
-        }
-      }
-    }
-    grid = rotateGrid(grid);  // Rotar la cuadrícula en sentido horario
-    rotationsNb++;
-  }
-
-  // Si el tamaño es impar, limpiar la celda central
-  if (n % 2 === 1) {
-    square[Math.floor(n / 2)][Math.floor(n / 2)] = "";
-  }
-
-  return square;
-};
-// Función para convertir el texto en una matriz cuadrada
-const textToSquare = (text: string, n: number): string[][] => {
-  const listText = text.split('');
-  let square: string[][] = Array.from({ length: n }, () => Array(n).fill("0"));
-  let letter = 0;
-
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < n; j++) {
-      if (n % 2 === 1 && i === Math.floor(n / 2) && j === Math.floor(n / 2)) {
-        square[i][j] = "";
-      } else if (letter < listText.length) {
-        square[i][j] = listText[letter];
-        letter++;
-      }
-    }
-  }
-  return square;
-};
-
-// Función para descifrar el texto (desencriptación)
-const decipher = (grid: number[][], n: number, square: string[][]): string => {
-  let decrypted = '';
-  let rotationsNb = 0;
-
-  while (rotationsNb < 1) {
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < n; j++) {
-        if (grid[i][j] === 1) {
-          if (square[i][j] !== "") { // Solo agregar caracteres no vacíos
-            decrypted += square[i][j] !== '0' ? square[i][j] : '';
+    while (true) { // Intentar hasta 2 veces: una vez original y otra rota
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          if (currentMatrix[row][col] === 1) {
+            encrypted += textMatrix[row][col] !== ' ' ? textMatrix[row][col] : ""; // Añadir el carácter correspondiente
           }
         }
       }
+
+      if (encrypted.length >= 16) {
+        break;
+      }
+
+      // Rota la matriz para la próxima iteración
+      currentMatrix = rotateMatrix(currentMatrix);
+      console.log(currentMatrix);
     }
-    grid = rotateGrid(grid); // Rotar la cuadrícula
-    rotationsNb++;
-  }
 
-  return decrypted;
-};
+    setEncryptedText(encrypted);
+  };
 
-// Función para aplanar la matriz en un texto secuencial
-const flattenSquare = (square: string[][]): string => {
-  let flattenedText = '';
-  for (let row of square) {
-    flattenedText += row.join('');  // Concatenar cada fila en una cadena
-  }
-  return flattenedText;
-};
+  const decryptText = (): void => {
+    let currentMatrix = matrix;
+    const decryptedMatrix = Array.from({ length: 4 }, () => Array(4).fill('')); // Matriz para almacenar el texto decriptado
+    let index = 0; // Índice para el texto encriptado
 
-// Componente principal
-const CryptographicGrid = () => {
-  const [text, setText] = useState("");
-  const [encryptedSquare, setEncryptedSquare] = useState<string[][]>([]);
-  const [flattenedText, setFlattenedText] = useState<string>("");
-  const [decryptedText, setDecryptedText] = useState("");
-  const [editableGrid, setEditableGrid] = useState<number[][]>(DEFAULT_GRID);
-
-  const handleCellClick = (row: number, col: number) => {
-    const newGrid = editableGrid.map((r, rowIndex) => {
-      return r.map((cell, colIndex) => {
-        // Cambiar de 0 a 1 y viceversa, además cambiar color
-        if (rowIndex === row && colIndex === col) {
-          return cell === 0 ? 1 : 0;
+    while (true) { // Intentar hasta 2 veces: una vez original y otra rota
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          if (currentMatrix[row][col] === 1) {
+            // Solo agregar si hay texto encriptado disponible
+            if (index < inputText.length) {
+              decryptedMatrix[row][col] = inputText[index]; // Almacenar en la matriz de decriptación
+              index++; // Incrementar el índice del texto encriptado
+            }
+          }
         }
-        return cell;
-      });
-    });
-    setEditableGrid(newGrid);
+      }
+
+      // Si ya se decriptó todo el texto, salir del bucle
+      if (index >= inputText.length) {
+        break;
+      }
+
+      // Rota la matriz para la próxima iteración
+      currentMatrix = rotateMatrix(currentMatrix);
+    }
+
+    // Leer el texto de la matriz de decriptación en el orden correcto
+    let decrypted = '';
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        decrypted += decryptedMatrix[row][col]; // Concatenar el texto de la matriz de decriptación
+      }
+    }
+
+    setDecryptedText(decrypted.trim()); // Quitar espacios en blanco al final
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const newValue = e.target.value;
+    if (newValue.length <= 16) {
+      setInputText(newValue);
+    }
+  };
+
+  const handleTextMatrixCellChange = (row: number, col: number, newValue: string): void => {
+    const newTextMatrix = textMatrix.map((r, rowIndex) =>
+      r.map((cell, colIndex) => (rowIndex === row && colIndex === col ? newValue : cell))
+    );
+    setTextMatrix(newTextMatrix);
   };
 
   const handleAction = (method: "cifrar" | "descifrar") => {
     if (method === "cifrar") {
-      const cleanText = text.replace(/\s+/g, "").toLowerCase();  // Limpiar el texto
-      const result = cipher(editableGrid, editableGrid.length, cleanText);
-      setEncryptedSquare(result);
-
-      // Aplanar la matriz en un solo string después de encriptar
-      const flattened = flattenSquare(result);
-      setFlattenedText(flattened);
+      handleConvertTextToMatrix()
+      encryptText()
     } else if (method === "descifrar") {
-      const square = textToSquare(text, editableGrid.length);  // Convertir el texto en matriz
-      const result = decipher(editableGrid, editableGrid.length, square);
-      setDecryptedText(result);
+      decryptText()
     }
   };
 
-  // Calcular la cantidad de caracteres posibles
-  const countPossibleCharacters = (grid: number[][]): number => {
-    return grid.flat().filter(cell => cell === 1).length;
-  };
-
   return (
-    <div className='bg-blue-100 p-6 rounded-lg shadow-md max-w-lg mx-auto mt-6'>
-      <h1 className="text-2xl font-bold mb-4 text-center">
-        Rejilla Criptográfica
+    <div className='bg-blue-100 p-6 rounded-lg shadow-md max-w-lg mx-auto mt-6 justify-center items-center flex flex-col'>
+      <h1 className="text-2xl font-bold text-center">
+        Permutación en Series
       </h1>
+      <button
+        onClick={() => setMatrix(rotateMatrix(matrix))}
+        className={`px-4 py-2 rounded-md font-semibold 
+                ${'bg-gray-200 text-gray-700 hover:bg-gray-300'}
+              `}
+      >
+        Rotar Matriz
+      </button>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 50px)', gap: '5px' }}>
+        {matrix.map((row, rowIndex) =>
+          row.map((cell, colIndex) => (
+            <div
+              key={`${rowIndex}-${colIndex}`}
+              onClick={() => toggleCell(rowIndex, colIndex)}
+              style={{
+                width: '50px',
+                height: '50px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                border: '1px solid black',
+                cursor: 'pointer',
+                backgroundColor: cell === 1 ? 'lightgreen' : 'lightcoral',
+              }}
+            >
+              {cell}
+            </div>
+          ))
+        )}
+      </div>
+      <h1 className="text-md font-bold mb-4 text-center">
+        Convertir Texto a Matriz 4x4      </h1>
       <div className="mb-4">
         <label className="block mb-2 font-semibold">Texto:</label>
         <input
           type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
+          value={inputText}
+          onChange={handleInputChange}
           className="border border-gray-300 p-2 w-full rounded"
         />
       </div>
+      <button
+        onClick={handleConvertTextToMatrix}
+        className={`px-4 py-2 rounded-md font-semibold 
+                ${'bg-gray-200 text-gray-700 hover:bg-gray-300'}
+              `}
+      >
+        Convertir a Matriz
+      </button>
 
-      <h3 className="text-lg font-semibold">Matrices:</h3>
-      <div className="flex justify-between space-x-4">
-        {/* Matriz Editable (Grid) */}
-        <div className="flex-1 border p-2 rounded bg-white">
-          <h4 className="font-semibold">Matriz Editable</h4>
-          <table className="w-full border-collapse">
-            <tbody>
-              {editableGrid.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {row.map((cell, cellIndex) => (
-                    <td
-                      key={cellIndex}
-                      onClick={() => handleCellClick(rowIndex, cellIndex)}
-                      className={`border border-gray-300 px-2 cursor-pointer ${cell === 1 ? 'bg-green-200' : 'bg-white'}`} // Color de fondo al seleccionar
-                    >
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Matriz Encriptada */}
-        <div className="flex-1 border p-2 rounded bg-white">
-          <h4 className="font-semibold">Matriz Encriptada</h4>
-          {encryptedSquare.length > 0 ? (
-            <table className="w-full border-collapse">
-              <tbody>
-                {encryptedSquare.map((row, rowIndex) => (
-                  <tr key={rowIndex}>
-                    {row.map((cell, cellIndex) => (
-                      <td
-                        key={cellIndex}
-                        className={`border border-gray-300 px-2 ${cell !== '0' ? 'bg-green-200' : 'bg-white'}`} // Color de fondo al seleccionar
-                      >
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>No hay matriz encriptada para mostrar.</p>
-          )}
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 50px)', gap: '5px' }}>
+        {textMatrix.map((row, rowIndex) =>
+          row.map((cell, colIndex) => (
+            <input
+              key={`text-${rowIndex}-${colIndex}`}
+              value={cell}
+              onChange={(e) => handleTextMatrixCellChange(rowIndex, colIndex, e.target.value)}
+              style={{
+                width: '50px',
+                height: '50px',
+                textAlign: 'center',
+                border: '1px solid black',
+                backgroundColor: 'lightblue',
+              }}
+            />
+          ))
+        )}
       </div>
-
-      <div className="mb-4">
-        <label className="block mb-2 font-semibold">Cantidad de Caracteres Posibles:</label>
-        <input
-          type="text"
-          value={countPossibleCharacters(editableGrid).toString()}
-          className="border border-gray-300 p-2 w-full rounded"
-          readOnly
-        />
-      </div>
-
       <div className="flex justify-center space-x-4">
         <Button
           opciones={[
             { label: "Cifrar", value: "cifrar" },
             { label: "Descifrar", value: "descifrar" },
           ]}
-          onClick={(value) => handleAction(value as "cifrar" | "descifrar")}
-          selectedValue={"undefined"}
+          onClick={(value) => handleAction(value as "cifrar" | "descifrar")} // Ejecuta directamente la acción seleccionada
+          selectedValue={"undefined"} // No es necesario mantener un estado de selección aquí
         />
       </div>
-
-      <div className="mt-4 mb-4">
-        <label className="block mb-2 font-semibold">Texto Aplanado:</label>
-        <input
-          type="text"
-          value={flattenedText}
-          className="border border-gray-300 p-2 w-full rounded"
-          readOnly
-        />
+      <h3>Texto Encriptado:</h3>
+      <div style={{ border: '1px solid black', padding: '10px', width: 'fit-content', backgroundColor: 'lightyellow' }}>
+        {encryptedText}
       </div>
 
-      <div className="mb-4">
-        <label className="block mb-2 font-semibold">Texto Desencriptado:</label>
-        <input
-          type="text"
-          value={decryptedText}
-          className="border border-gray-300 p-2 w-full rounded"
-          readOnly
-        />
+      <h3>Texto Decriptado:</h3>
+      <div style={{ border: '1px solid black', padding: '10px', width: 'fit-content', backgroundColor: 'lightgreen' }}>
+        {decryptedText}
       </div>
     </div>
   );
 };
 
-export default CryptographicGrid;
+export default EditableMatrix;
