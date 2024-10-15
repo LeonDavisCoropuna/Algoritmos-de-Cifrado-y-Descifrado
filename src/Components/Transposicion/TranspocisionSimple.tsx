@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "../Button/Button"; // Asumiendo que Button ya está estilizado con Tailwind
 
 const TranspocisionSimple = () => {

@@ -36,7 +36,7 @@ function App() {
             { label: 'Permutación en Series', value: 'permutacion' },
             { label: 'Rejilla Criptográfica', value: 'grid' }
           ]}
-            onClick={(value) => setSelectedMethod(value)}
+            onClick={(value) => setSelectedMethod(value as "simple")}
             selectedValue={selectedMethod} />
         </div>
       </div>
