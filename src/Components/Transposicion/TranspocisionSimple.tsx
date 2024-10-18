@@ -12,12 +12,15 @@ const TranspocisionSimple = () => {
     const keyLower = key.toLowerCase();
     const numCols = key.length;
     const numRows = Math.ceil(text.length / numCols);
-    const paddedText = text.padEnd(numRows * numCols, " "); // Padding con espacios si es necesario
+    const remainingChars = numRows * numCols - text.length;
+    
+    // Llenar con guiones si la última fila no se completa
+    const paddedText = text.padEnd(text.length + remainingChars, "-");
     const matrix: string[][] = [];
 
     // Llenar la matriz fila por fila
     for (let i = 0; i < numRows; i++) {
-      matrix.push(paddedText.slice(i * numCols, (i + 1) * numCols).split(""));
+        matrix.push(paddedText.slice(i * numCols, (i + 1) * numCols).split(""));
     }
 
     // Guardar la matriz en el estado
@@ -84,6 +87,10 @@ const TranspocisionSimple = () => {
       setDecryptedText(result);
     }
   };
+  const getAlphabetOrder = (char: string): number => {
+    return char.charCodeAt(0) - 'a'.charCodeAt(0) + 1;
+  };
+
 
   return (
     <div className="bg-blue-100 p-6 rounded-lg shadow-md max-w-lg mx-auto mt-6">
@@ -131,14 +138,22 @@ const TranspocisionSimple = () => {
         {matrix.length > 0 ? (
           <table className="w-full border-collapse">
             <thead>
-              <tr>
-                {/* Encabezado de la clave */}
-                {key.split("").map((char, index) => (
-                  <th key={index} className="border border-gray-300 p-2 bg-blue-100">
-                    {char}
-                  </th>
-                ))}
-              </tr>
+            <tr>
+        {/* Encabezado de la clave */}
+        {key.split("").map((char, index) => (
+          <th key={index} className="border border-gray-300 p-2 bg-blue-100">
+            {char}
+          </th>
+        ))}
+      </tr>
+      <tr>
+        {/* Encabezado del orden alfabético */}
+        {key.split("").map((char, index) => (
+          <th key={index} className="border border-gray-300 p-2 bg-blue-100">
+            {getAlphabetOrder(char)}
+          </th>
+        ))}
+      </tr>
             </thead>
             <tbody>
               {matrix.map((row, rowIndex) => (
