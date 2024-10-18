@@ -79,9 +79,9 @@ const EditableMatrix: React.FC = () => {
   };
 
   const handleConvertTextToMatrix = (): void => {
-    // Rellena con 'X' hasta 16 caracteres
-    const paddedText = inputText.padEnd(matrixSize ** 2, '-');
-    setInputText(paddedText)
+    const cleanText = inputText.replace(/\s+/g, '');
+    const paddedText = cleanText.padEnd(matrixSize ** 2, '-');
+    setInputText(paddedText);
     const newTextMatrix = Array.from({ length: matrixSize }, (_, rowIndex) =>
       Array.from({ length: matrixSize }, (_, colIndex) =>
         paddedText[rowIndex * matrixSize + colIndex] // Obtiene el carácter correspondiente
@@ -89,6 +89,7 @@ const EditableMatrix: React.FC = () => {
     );
     setTextMatrix(newTextMatrix);
   };
+
 
   const markFull = (matrixMark: { value: number; marked: boolean; }[][]): boolean => {
     for (let row = 0; row < matrixSize; row++) {
@@ -99,6 +100,7 @@ const EditableMatrix: React.FC = () => {
     return false; // Devuelve false si todas las celdas están marcadas
   };
   const encryptText = (): void => {
+    handleConvertTextToMatrix()
     let currentMatrix = matrix;
     let matrixMark: { value: number; marked: boolean }[][] = Array.from({ length: matrixSize }, () =>
       Array(matrixSize).fill({ value: 0, marked: false })
