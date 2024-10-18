@@ -133,7 +133,8 @@ const TranspocisionDoble = () => {
 
   const handleAction = (method: "cifrar" | "descifrar") => {
     if (method === "cifrar") {
-      const result = encrypt(inputText, key1, key2); // Remueve los espacios en blanco
+      let inputTexts = inputText.replace(/\s+/g, ''); // Eliminar todos los espacios
+      const result = encrypt(inputTexts, key1, key2); // Remueve los espacios en blanco
       setEncryptedText(result);
       setDecryptedText(""); // Limpiar el texto descifrado
     } else if (method === "descifrar") {
