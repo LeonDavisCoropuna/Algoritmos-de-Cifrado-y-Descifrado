@@ -48,7 +48,7 @@ const TranspocisionDoble = () => {
     // Cifrado con la segunda clave
     const numCols2 = key2.length;
     const numRows2 = Math.ceil(intermediateText.length / numCols2);
-    const paddedText2 = intermediateText.padEnd(numRows2 * numCols2, " ");
+    const paddedText2 = intermediateText.padEnd(numRows2 * numCols2, "-");
     const tempMatrix2: string[][] = [];
 
     for (let i = 0; i < numRows2; i++) {
