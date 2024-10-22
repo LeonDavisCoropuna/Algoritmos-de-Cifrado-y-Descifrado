@@ -79,8 +79,7 @@ const EditableMatrix: React.FC = () => {
   };
 
   const handleConvertTextToMatrix = (): void => {
-    const cleanText = inputText.replace(/\s+/g, '');
-    const paddedText = cleanText.padEnd(matrixSize ** 2, '-');
+    const paddedText = inputText.padEnd(matrixSize ** 2, '-');
     setInputText(paddedText);
     const newTextMatrix = Array.from({ length: matrixSize }, (_, rowIndex) =>
       Array.from({ length: matrixSize }, (_, colIndex) =>
@@ -305,14 +304,14 @@ const EditableMatrix: React.FC = () => {
           selectedValue={"undefined"} // No es necesario mantener un estado de selección aquí
         />
       </div>
-      <h3>Texto Encriptado:</h3>
-      <div style={{ border: '1px solid black', padding: '10px', width: 'fit-content', backgroundColor: 'lightyellow' }}>
-        {encryptedText}
-      </div>
 
-      <h3>Texto Decriptado:</h3>
-      <div style={{ border: '1px solid black', padding: '10px', width: 'fit-content', backgroundColor: 'lightgreen' }}>
-        {decryptedText}
+      <div className="mt-4">
+        <h3 className="font-semibold whitespace-pre">Texto Cifrado:</h3>
+        <p className="p-2 bg-gray-200 rounded whitespace-pre">{encryptedText || "..."}</p>
+      </div>
+      <div className="mt-4">
+        <h3 className="font-semibold whitespace-pre">Texto Descifrado:</h3>
+        <p className="p-2 bg-gray-200 rounded whitespace-pre">{decryptedText || "..."}</p>
       </div>
     </div>
   );

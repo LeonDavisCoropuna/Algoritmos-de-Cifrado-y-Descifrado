@@ -177,12 +177,12 @@ const TranspocisionSimple = () => {
 
       <div className="mt-4">
         <h3 className="font-semibold">Texto Cifrado:</h3>
-        <p className="p-2 bg-gray-200 rounded">{encryptedText || "..."}</p>
+        <p className="p-2 bg-gray-200 rounded whitespace-pre">{encryptedText || "..."}</p>
       </div>
 
       <div className="mt-4">
         <h3 className="font-semibold">Texto Descifrado:</h3>
-        <p className="p-2 bg-gray-200 rounded">{decryptedText || "..."}</p>
+        <p className="p-2 bg-gray-200 rounded whitespace-pre">{decryptedText || "..."}</p>
       </div>
     </div>
   );
