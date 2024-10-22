@@ -1,97 +1,121 @@
-import { useState } from 'react';
-import { Button } from '../Button/Button';
+import React, { useState } from "react";
+import { Button } from "../Button/Button";
 
-const PermutationCipher = () => {
-    const [text, setText] = useState('');
-    const [key, setKey] = useState('');
+// Función para convertir un número en una letra del abecedario (0 → 'A', 1 → 'B', ..., 25 → 'Z')
+const convertAbecedario = (index: number): string => {
+    return String.fromCharCode(index + 65); // Convierte 0 → 'A', 1 → 'B', ..., 25 → 'Z'
+};
+
+// Función para generar los números clave
+const keynumbers = (key: string): number[] => {
+    const k: number[] = Array(key.length).fill(0);
+    let a = 1;
+    for (let i = 0; i < 26; i++) {
+        for (let j = 0; j < key.length; j++) {
+            if (key[j] === convertAbecedario(i)) {
+                k[j] = a;
+                a++;
+            }
+        }
+    }
+    return k;
+};
+
+// Función de cifrado por permutaciones
+const cifradoPermutaciones = (text: string, key: string): string => {
+    const ptext = text.toUpperCase();
+    const keyn = keynumbers(key.toUpperCase());
+    const m = Math.ceil(ptext.length / key.length);
+    const mainArray: string[][] = Array.from({ length: m }, () => Array(key.length).fill(""));
+
+    let q = 0;
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < key.length; j++) {
+            if (q < ptext.length) {
+                mainArray[i][j] = ptext[q];
+                q++;
+            }
+        }
+    }
+
+    const cArray: string[][] = Array.from({ length: m }, () => Array(key.length).fill(""));
+
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < keyn.length; j++) {
+            cArray[i][keyn[j] - 1] = mainArray[i][j];
+        }
+    }
+
+    let encrypted = "";
+    for (const row of cArray) {
+        for (const char of row) {
+            encrypted += char;
+        }
+    }
+    console.log(encrypted)
+    return encrypted;
+};
+
+// Función de descifrado por permutaciones
+const descifradoPermutaciones = (text: string, key: string): string => {
+    const ptext = text.toUpperCase();
+    const keyn = keynumbers(key.toUpperCase());
+    const m = Math.ceil(ptext.length / key.length);
+    const mainArray: string[][] = Array.from({ length: m }, () => Array(key.length).fill(""));
+
+    let q = 0;
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < key.length; j++) {
+            if (q < ptext.length) {
+                mainArray[i][j] = ptext[q];
+                q++;
+            }
+        }
+    }
+
+    const dArray: string[][] = Array.from({ length: m }, () => Array(key.length).fill(""));
+
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < keyn.length; j++) {
+            dArray[i][j] = mainArray[i][keyn[j] - 1];
+        }
+    }
+
+    let decrypted = "";
+    for (const row of dArray) {
+        for (const char of row) {
+            decrypted += char;
+        }
+    }
+    return decrypted;
+};
+
+// Componente de React
+const EncryptionComponent: React.FC = () => {
+    const [text, setText] = useState<string>("");
+    const [key, setKey] = useState<string>("");
     const [encryptedText, setEncryptedText] = useState<string>("");
     const [decryptedText, setDecryptedText] = useState<string>("");
-    const [alphabet, setAlphabet] = useState<string>("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-    const keyNumbers = (key: string) => {
-        let k = Array(key.length);
-        let a = 1;
-
-        for (let i = 0; i < alphabet.length; i++) {
-            for (let j = 0; j < key.length; j++) {
-                if (key[j] === alphabet[i]) {
-                    k[j] = a++;
-                }
-            }
-        }
-        return k;
-    };
-
-    const permuteEncrypt = (ptext: string, key: string) => {
-        ptext = ptext.toUpperCase();
-        const keyn = keyNumbers(key.toUpperCase());
-        const m = Math.ceil(ptext.length / key.length);
-        let mainArray = Array.from({ length: m }, () => Array(key.length).fill(''));
-
-        let q = 0;
-        for (let i = 0; i < m; i++) {
-            for (let j = 0; j < key.length; j++) {
-                if (q < ptext.length) {
-                    mainArray[i][j] = ptext[q++];
-                }
-            }
-        }
-
-        let cArray = Array.from({ length: m }, () => Array(key.length).fill(''));
-        for (let i = 0; i < m; i++) {
-            for (let j = 0; j < keyn.length; j++) {
-                cArray[i][keyn[j] - 1] = mainArray[i][j];
-            }
-        }
-
-        return cArray.flat().join('');
-    };
-
-    const permuteDecrypt = (ctext: string, key: string) => {
-        ctext = ctext.toUpperCase();
-        const keyn = keyNumbers(key.toUpperCase());
-        const m = Math.ceil(ctext.length / key.length);
-        let mainArray = Array.from({ length: m }, () => Array(key.length).fill(''));
-
-        let q = 0;
-        for (let i = 0; i < m; i++) {
-            for (let j = 0; j < key.length; j++) {
-                if (q < ctext.length) {
-                    mainArray[i][keyn[j] - 1] = ctext[q++];
-                }
-            }
-        }
-
-        return mainArray.flat().join('').trim();
-    };
 
     const handleAction = (method: "cifrar" | "descifrar") => {
         if (method === "cifrar") {
-            const result = permuteEncrypt(text, key);
-            setEncryptedText(result);
+            const result = cifradoPermutaciones(text, key)
+            setEncryptedText(result)
             setDecryptedText(""); // Limpiar el texto descifrado
         } else if (method === "descifrar") {
-            const result = permuteDecrypt(text, key);
+            const result = descifradoPermutaciones(text, key);
             setDecryptedText(result);
-            setEncryptedText(""); // Limpiar el texto descifrado
+            setEncryptedText("")
         }
     };
 
     return (
-        <div className='bg-blue-100 p-6 rounded-lg shadow-md max-w-lg mx-auto mt-6'>
-            <h1 className="text-2xl font-bold mb-4 text-center">
-                Permutación en Series
+        <div>
+            <h1 className="text-2xl font-bold p-4 text-center">
+                Cifrado por Permutaciones
             </h1>
             <div className="mb-4">
-                <label className="block mb-2 font-semibold">Alfabeto:</label>
-                <input
-                    type="text"
-                    value={alphabet}
-                    onChange={(e) => setAlphabet(e.target.value)}
-                    className="border border-gray-300 p-2 w-full rounded"
-                />
-            </div>
-            <div className="mb-4">
-                <label className="block mb-2 font-semibold">Texto:</label>
+                <label className="block font-semibold">Texto:</label>
                 <input
                     type="text"
                     value={text}
@@ -99,8 +123,8 @@ const PermutationCipher = () => {
                     className="border border-gray-300 p-2 w-full rounded"
                 />
             </div>
-            <div className="mb-4">
-                <label className="block mb-2 font-semibold">Clave:</label>
+            <div>
+                <label className="block font-semibold">Clave:</label>
                 <input
                     type="text"
                     value={key}
@@ -119,18 +143,16 @@ const PermutationCipher = () => {
                     selectedValue={"undefined"} // No es necesario mantener un estado de selección aquí
                 />
             </div>
-
             <div className="mt-4">
-                <h3 className="font-semibold">Texto Cifrado:</h3>
-                <p className="p-2 bg-gray-200 rounded">{encryptedText || "..."}</p>
+                <h3 className="font-semibold whitespace-pre">Texto Cifrado:</h3>
+                <p className="p-2 bg-gray-200 rounded whitespace-pre">{encryptedText || "..."}</p>
             </div>
-
             <div className="mt-4">
-                <h3 className="font-semibold">Texto Descifrado:</h3>
-                <p className="p-2 bg-gray-200 rounded">{decryptedText || "..."}</p>
+                <h3 className="font-semibold whitespace-pre">Texto Descifrado:</h3>
+                <p className="p-2 bg-gray-200 rounded whitespace-pre">{decryptedText || "..."}</p>
             </div>
         </div>
     );
 };
 
-export default PermutationCipher;
+export default EncryptionComponent;
