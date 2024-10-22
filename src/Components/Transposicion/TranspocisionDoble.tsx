@@ -73,7 +73,7 @@ const TranspocisionDoble = () => {
     }
 
     console.log("Texto cifrado final tras el segundo cifrado:", encrypted);
-    return encrypted.trim(); // Devolver el texto cifrado
+    return encrypted; // Devolver el texto cifrado
   };
 
   const decrypt = (text: string, key1: string, key2: string): string => {
@@ -139,7 +139,7 @@ const TranspocisionDoble = () => {
       decrypted += decryptedMatrix1[i].join("");
     }
   
-    return decrypted.trim(); // Eliminar caracteres de relleno al final
+    return decrypted; // Eliminar caracteres de relleno al final
   };
   
 

@@ -40,7 +40,7 @@ const TranspocisionSimple = () => {
         encrypted += matrix[j][index] || ""; // Usa '' si el índice está fuera de rango
       }
     }
-    return encrypted.trim(); // Retornar cadena sin espacios al final
+    return encrypted; // Retornar cadena sin espacios al final
   };
 
   const decrypt = (text: string, key: string): string => {
@@ -73,7 +73,7 @@ const TranspocisionSimple = () => {
     for (let i = 0; i < numRows; i++) {
       decrypted += decryptedMatrix[i].join("");
     }
-    return decrypted.trim(); // Retornar cadena sin espacios al final
+    return decrypted; // Retornar cadena sin espacios al final
   };
 
   const handleAction = (method: "cifrar" | "descifrar") => {
