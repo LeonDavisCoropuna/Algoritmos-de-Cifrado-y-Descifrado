@@ -78,8 +78,8 @@ const TranspocisionSimple = () => {
 
   const handleAction = (method: "cifrar" | "descifrar") => {
     if (method === "cifrar") {
-      let inputTexts = inputText.replace(/\s+/g, ''); // Eliminar todos los espacios
-      const result = encrypt(inputTexts, key);
+      //let inputTexts = inputText.replace(/\s+/g, ''); // Eliminar todos los espacios
+      const result = encrypt(inputText, key);
       setEncryptedText(result);
       setDecryptedText(""); // Limpiar el texto descifrado
     } else if (method === "descifrar") {
