@@ -79,8 +79,8 @@ const TranspocisionDoble = () => {
   const decrypt = (text: string, key1: string, key2: string): string => {
     const key1Lower = key1.toLowerCase();
     const key2Lower = key2.toLowerCase();
-
-    // Descifrado con la segunda clave
+  
+    // Descifrado con la segunda clave (de mayor longitud si es el caso)
     const numCols2 = key2.length;
     const numRows2 = Math.ceil(text.length / numCols2);
     const keyOrder2 = key2Lower
@@ -88,11 +88,11 @@ const TranspocisionDoble = () => {
       .map((char, index) => ({ char, index }))
       .sort((a, b) => a.char.localeCompare(b.char))
       .map((item) => item.index);
-
+  
     const decryptedMatrix2: string[][] = Array.from({ length: numRows2 }, () =>
       Array(numCols2).fill("")
     );
-
+  
     let index = 0;
     for (const col of keyOrder2) {
       for (let j = 0; j < numRows2; j++) {
@@ -102,13 +102,16 @@ const TranspocisionDoble = () => {
         }
       }
     }
-
+  
     let intermediateText = "";
     for (let i = 0; i < numRows2; i++) {
       intermediateText += decryptedMatrix2[i].join("");
     }
-
-    // Descifrado con la primera clave
+  
+    // Eliminar caracteres de relleno "-" si es necesario
+    intermediateText = intermediateText.replace(/-+$/g, "");
+  
+    // Descifrado con la primera clave (de menor longitud si es el caso)
     const numCols1 = key1.length;
     const numRows1 = Math.ceil(intermediateText.length / numCols1);
     const keyOrder1 = key1Lower
@@ -116,11 +119,11 @@ const TranspocisionDoble = () => {
       .map((char, index) => ({ char, index }))
       .sort((a, b) => a.char.localeCompare(b.char))
       .map((item) => item.index);
-
+  
     const decryptedMatrix1: string[][] = Array.from({ length: numRows1 }, () =>
       Array(numCols1).fill("")
     );
-
+  
     index = 0;
     for (const col of keyOrder1) {
       for (let j = 0; j < numRows1; j++) {
@@ -130,14 +133,15 @@ const TranspocisionDoble = () => {
         }
       }
     }
-
+  
     let decrypted = "";
     for (let i = 0; i < numRows1; i++) {
       decrypted += decryptedMatrix1[i].join("");
     }
-
-    return decrypted.trim(); // Devuelve la cadena recortada
+  
+    return decrypted.trim(); // Eliminar caracteres de relleno al final
   };
+  
 
   const handleAction = (method: "cifrar" | "descifrar") => {
     if (method === "cifrar") {
